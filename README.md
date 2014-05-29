@@ -1,4 +1,4 @@
-my-desing-soft
+my-design-soft
 ==============
 
 アニメーション作成ソフト的な何か
