@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width"/>
+		<title>My Design Soft - akouryy.net</title>
+		<link href="index.css" rel="stylesheet"/>
+		<link href="jQuery-color-picker/colorpicker.css" rel="stylesheet"/>
+		<script src="jQuery.js"></script>
+		<script src="jQueryContextMenu.js"></script>
+		<script src="index.js"></script>
+		<script src="jQuery-color-picker/colorpicker.js"></script>
+	</head>
+	<body>
+		<div id="canvas">
+			<svg overflow="visible">
+ 			</svg>
+ 			<div id="mds-info">
+<!--				My Design Soft v.0.0.α
+				IT'S ALPHA VERSION. YOU MUST BE CAREFUL.
+				MDS IS FREE. USE THIS SOFTWARE AT YOUR OWN RISK.
+				Last update: 2014-05-20(JST)-->
+				<h1>My Design Soft バージョン0.0.α</h1>
+				これはアルファバージョンです。ご注意ください。<br/>
+				MDSはフリーです。このソフトを使用したことによる損害について製作者は一切責任を負いません。<br/>
+				最終更新: 2014-05-29(JST)
+ 			</div>
+		</div>
+		<div id="objects">
+			<div class="contextMenu" id="object-menu" style="display: none">
+				<ul>
+					<li id="select-object">選択</li>
+					<li id="delete-object">削除</li>
+				</ul>
+			</div>
+			<div id="objects-menu">
+				<button id="unselect" title="全て選択解除">unselect all</button>
+				<button id="remove" title="削除">remove</button>
+			</div>
+			<div><table></table></div>
+		</div>
+		<div id="animations">
+			<div class="contextMenu" id="control-point-menu" style="display: none">
+				<ul>
+					<li id="select-object-frame">選択</li>
+					<li id="select-object">オブジェクトを選択</li>
+					<li id="select-frame">フレームを選択</li>
+					<li id="delete-object">オブジェクトを削除</li>
+					<li id="delete-control-point">制御点を削除</li>
+				</ul>
+			</div>
+			<table>
+				<tr class="header">
+					<th class="html-id">ID</th>
+					<th class="shape-type">形</th>
+				</tr>
+			</table>
+		</div>
+		<div id="tools">
+			<div id="general-tools">
+				<div class="tool mode-tool tool-selected" id="mode-none" title="none">
+					<svg width="20" height="20">
+					</svg>
+				</div>
+				<div class="tool mode-tool" id="draw-point" title="点">
+					<svg width="20" height="20">
+						<circle cx="10" cy="10" r="2" fill="#f00"/>
+					</svg>
+				</div>
+				<div class="tool mode-tool" id="draw-line" title="直線">
+					<svg width="20" height="20">
+						<line x1="0" y1="0" x2="20" y2="20" stroke="#f00" fill="none"/>
+					</svg>
+				</div>
+				<div class="tool mode-tool" id="draw-bezeir" title="3次ベジェ曲線">
+					<svg width="20" height="20">
+						<path d="M 0 0 C 15 0, 5 20, 20 20" stroke="#f00" fill="none"/>
+					</svg>
+				</div>
+				<div class="tool mode-tool" id="move-point" title="移動">
+					<svg width="20" height="20">
+						<circle cx="5" cy="5" r="2" fill="#f99"/>
+						<circle cx="15" cy="15" r="2" fill="#f00"/>
+					</svg>
+				</div>
+				<div class="tool mode-tool" id="change-color" title="色変換">
+					<svg width="20" height="20" style="background:#333">
+						<rect x="0" y="0" width="20" height="20" fill="url(#g-1562732543)"/>
+						<linearGradient gradientUnits="userSpaceOnUse" y2="100%" id="g-1562732543">
+							<stop offset="10%" stop-color="#f00"/>
+							<stop offset="30%" stop-color="#ff0"/>
+							<stop offset="50%" stop-color="#0f0"/>
+							<stop offset="70%" stop-color="#0ff"/>
+							<stop offset="90%" stop-color="#00f"/>
+						</linearGradient>
+					</svg>
+				</div>
+				<div class="tool mode-tool" id="animation-mode" title="アニメーション">
+					<svg width="20" height="20">
+						<line x1="0" y1="0" x2="20" y2="15" stroke="#f00" fill="none">
+							<animate attributeName="x1" begin="0s" dur="3s" values="0;10;0"   repeatCount="indefinite"/>
+							<animate attributeName="y1" begin="0s" dur="3s" values="0;5;0"    repeatCount="indefinite"/>
+							<animate attributeName="x2" begin="0s" dur="3s" values="20;5;20"  repeatCount="indefinite"/>
+							<animate attributeName="y2" begin="0s" dur="3s" values="15;20;15" repeatCount="indefinite"/>
+						</line>
+					</svg>
+				</div>
+				<div class="tool" id="show-mds-info" title="MDSについて">
+					<svg width="20" height="20" style="background:#333">
+						<rect x="8" y="9" width="3" height="9" fill="#fff"/>
+						<circle cx="10" cy="4" r="2" fill="#fff"/>
+					</svg>
+				</div>
+			</div>
+			<div id="animation-tools">
+				<input type="range" max="1" min="0" value="0" id="animation-range" />
+				<div class="tool anime-tool" id="animation-start" title="再生">
+					<svg width="20" height="20">
+						<polygon points="7,5 7,15 17,10" fill="#0ff" />
+					</svg>
+				</div>
+				<div class="tool" id="animation-pause" style="display: none" title="一時停止">
+					<svg width="20" height="20">
+						<rect x="5" y="5" width="4" height="10" fill="#0ff" />
+						<rect x="11" y="5" width="4" height="10" fill="#0ff" />
+					</svg>
+				</div>
+				<div class="tool tool-selected" id="animation-stop" title="停止">
+					<svg width="20" height="20">
+						<rect x="5" y="5" width="10" height="10" fill="#0ff" />
+					</svg>
+				</div>
+				<div class="tool anime-tool" id="animation-loop" title="ループ再生">
+					<svg width="20" height="20">
+						<path d="M 10,18 A 8,8 0 1 1 16,16" fill="none" stroke="#0ff" stroke-width="2" />
+						<polygon points="13,12 19,18 12,19" fill="#0ff"/>
+					</svg>
+				</div>
+			</div>
+		</div>
+		<div id="ad">
+			<div id="xdomain_ad_300x100"></div> 
+		</div>
+	</body>
+</html>

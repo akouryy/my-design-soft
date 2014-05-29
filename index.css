@@ -1,0 +1,148 @@
+body{
+	font-family: 'Lucida Grande', 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, sans-serif;
+	font-size: 0.8em;
+	margin: 0;
+	overflow: hidden;
+}
+#canvas{
+	background: #fff;
+	border: 1px solid #333;
+	position: absolute;
+	height: 80%;
+	width: 80%;
+}
+#canvas>svg{
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+}
+#mds-info{
+	background: rgba(0, 0, 0, 0.8);
+	color: #fff;
+	display: none;
+	padding: 1em;
+	position: absolute;
+	top: 20%;
+	left: 20%;
+	height: 60%;
+	width: 60%;
+}
+#tools{
+	background: #334;
+	padding: 0em;
+	position: absolute;
+	top: 80%;
+	height: 20%;
+	width: 100%;
+}
+.tool{
+	background: #fff;
+	cursor: pointer;
+	padding: 0;
+	display: inline-block;
+	height: 20px;
+	width: 20px;
+}
+.tool-selected{
+	border: #00c 2px solid;
+	border-radius: 2px;
+}
+#objects{
+	background: #666;
+	position: absolute;
+	left: 80%;
+	transition: left 0.5s;
+	height: 80%;
+	width: 20%;
+}
+#objects button{
+	cursor: pointer;
+}
+#objects>div:not(#objects-menu){
+	overflow-x: hidden;
+	overflow-y: scroll;
+	height: calc(100% - 1.5em);
+	width: 100%;
+}
+#objects table{
+	width: 100%;
+}
+#objects tr:nth-child(odd){
+	background: #ddf;
+}
+#objects tr:nth-child(even){
+	background: #dfd;
+}
+#objects .prop-selected{
+	color: #f00;
+}
+#objects td.html-id{
+	width: 20%;
+}
+#objects td.shape-type{
+	width: 20%;
+}
+#animations{
+	background: #666;
+	display: none;
+	position: absolute;
+	left: 0;
+	height: 80%;
+	width: 100%;
+}
+#animations table{
+	border-collapse: separate;
+	border-spacing: 0;
+	table-layout: fixed;
+	width: 100%;
+}
+#animations tr.header{
+	background: #ccc !important;
+}
+#animations tr:nth-child(odd){
+	background: #ddf;
+}
+#animations tr:nth-child(even){
+	background: #dfd;
+	border: none;
+}
+#animations .prop-selected{
+	color: #f00;
+}
+#animations td{
+	border-left: 1px solid #ccc;
+}
+#animations .html-id{
+	border-left: 0px;
+	width: 4%;
+}
+#animations .shape-type{
+	border-left: 2px solid #999;
+	width: 4%;
+}
+#animations .bold-grid-line{
+	border-left: 1px solid #000;
+}
+#animations .thin-grid-line{
+	border-left: 1px solid #999;
+}
+#animations th.thin-grid-line{
+	font-weight: normal;
+}
+#animations .grid-control-point{
+	background: #f99;
+}
+#animations .anime-grid-editing{
+	border-left: 2px solid #f00 !important;
+	border-right: 2px solid #f00 !important;
+}
+#ad{
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
+#ad *{
+	margin: 0 !important;
+}
