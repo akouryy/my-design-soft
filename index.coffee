@@ -2,6 +2,17 @@ debug = (x) ->
 	alert x
 	console.log x
 pass = undefined
+RGBToHex = (rgb) ->
+	hex = [
+		rgb.r.toString 16
+		rgb.g.toString 16
+		rgb.b.toString 16
+	]
+	for val, i in hex
+		if val.length == 1
+			hex[i] = "0#{val}"
+	hex.join ''
+
 FPS = 10
 view_sec = 10
 MDS =
@@ -17,7 +28,7 @@ MDS =
 	AnimeGridSize: 1
 	add: (shape) ->
 		@shapeList.push shape
-		$s = $ shape.toSvg @editFrame
+		$s = $ shape.toSvg()
 				 .attr 'id', "shape-#{shape.html_id}"
 		$ '#canvas svg'
 			.append $s
@@ -33,7 +44,7 @@ MDS =
 				.before propTr
 			$ "#anime-#{shape.children[0].html_id}"
 				.before animeTr
-		[[x1, y1], [x2, y2]] = shape.coverRect @editFrame
+		[[x1, y1], [x2, y2]] = shape.coverRect()
 		$ '<rect fill="none" stroke="#333" stroke-dasharray="5,10"/>'
 			.attr
 				x: x1
@@ -46,7 +57,7 @@ MDS =
 		@hide s for s in shape.children
 		@select shape unless shape.parent?
 	prepareTr: (shape, isAnime) ->
-		tr = $ shape.toTr @editFrame
+		tr = $ shape.toTr()
 		if isAnime
 			tr.attr 'id', "anime-#{shape.html_id}"
 			for i in [0 ... view_sec * FPS]
@@ -111,9 +122,9 @@ MDS =
 			@remove shape.parent unless parentDone?
 	reload: (shape) ->
 		$ "#shape-#{shape.html_id}"
-			.replaceWith $(shape.toSvg @editFrame).attr 'id', "shape-#{shape.html_id}"
-		r = shape.coverRect @editFrame
-		[[x1, y1], [x2, y2]] = shape.coverRect @editFrame
+			.replaceWith $(shape.toSvg()).attr 'id', "shape-#{shape.html_id}"
+		r = shape.coverRect()
+		[[x1, y1], [x2, y2]] = shape.coverRect()
 		$ "#select-#{shape.html_id}"
 			.attr
 				x: x1
@@ -145,7 +156,7 @@ MDS =
 			$ "#select-#{shape.html_id}"
 				.css 'display', 'inline'
 			$ '#change-color'
-				.ColorPickerSetColor shape.cs[@editFrame]
+				.ColorPickerSetColor shape.getColor()
 			@show s for s in shape.children
 		catch err
 			debug err
@@ -192,7 +203,7 @@ MDS =
 				when 'point'
 					@unselectAll()
 					p = new Point()
-					p.set 0, ev.pageX, ev.pageY
+					p.set ev.pageX, ev.pageY, 0
 					@add p
 					@refresh()
 				when 'line', 'bezeir'
@@ -200,7 +211,7 @@ MDS =
 					unless @handlingShape?
 						@nextIndex = 0
 						@handlingShape = new @shapeTypes[@mode]()
-					@handlingShape.children[@nextIndex].set 0, ev.pageX, ev.pageY
+					@handlingShape.children[@nextIndex].set ev.pageX, ev.pageY, 0
 					@add @handlingShape.children[@nextIndex]
 					@refresh()
 					@nextIndex++
@@ -212,7 +223,7 @@ MDS =
 					unless @selectedMainly instanceof Pointlike
 						alert "#{@selectedMainly.constructor.name}は動かせません"
 						return
-					@selectedMainly.set @editFrame, ev.pageX, ev.pageY
+					@selectedMainly.set ev.pageX, ev.pageY
 					@reload @selectedMainly
 					@refresh()
 		catch err
@@ -267,36 +278,36 @@ class Shape
 		@parent = parent ? null
 		@html_id = if parent? then "#{parent.html_id}-#{index}" else MDS.html_id++
 		@parent?.children.push this
-	setColor: (f, r, g, b) ->
+	setColor: (r, g, b, f = MDS.editFrame) ->
 		@cs[f] = [r, g, b]
-	getColor: (f) ->
+	getColor: (f = MDS.editFrame) ->
 		oldF = -1
 		[oldR, oldG, oldB] = @cs[0]
 		for newF, [newR, newG, newB] of @cs
 			if newF >= f
-				return [
-					Math.floor oldR + (newR - oldR) / (newF - oldF) * (f - oldF)
-					Math.floor oldG + (newG - oldG) / (newF - oldF) * (f - oldF)
-					Math.floor oldB + (newB - oldB) / (newF - oldF) * (f - oldF)
-				]
+				return {
+					r: Math.floor oldR + (newR - oldR) / (newF - oldF) * (f - oldF)
+					g: Math.floor oldG + (newG - oldG) / (newF - oldF) * (f - oldF)
+					b: Math.floor oldB + (newB - oldB) / (newF - oldF) * (f - oldF)
+				}
 			oldF = newF
 			oldR = newR
 			oldG = newG
 			oldB = newB
-		return [
-			Math.floor oldR
-			Math.floor oldG
-			Math.floor oldB
-		]
-	toSvg: (f) ->
+		return {
+			r: Math.floor oldR
+			g: Math.floor oldG
+			b: Math.floor oldB
+		}
+	toSvg: (f = MDS.editFrame) ->
 		pass
-	updateSvg: (svg, f) ->
+	updateSvg: (svg, f = MDS.editFrame) ->
 		pass
-	toTr: (f) ->
+	toTr: (f = MDS.editFrame) ->
 		pass
-	updateTr: (tr, f) ->
+	updateTr: (tr, f = MDS.editFrame) ->
 		pass
-	coverRect: (f) ->
+	coverRect: (f = MDS.editFrame) ->
 		pass
 class Pointlike extends Shape
 	constructor: (parent, index) ->
@@ -306,9 +317,9 @@ class Point extends Pointlike
 	constructor: (parent, index) ->
 		@ps = {}
 		super parent, index
-	set: (f, x, y) ->
+	set: (x, y, f = MDS.editFrame) ->
 		@ps[f] = [x, y]
-	get: (f) ->
+	get: (f = MDS.editFrame) ->
 		oldF = -1
 		[oldX, oldY] = @ps[0]
 		for newF, [newX, newY] of @ps
@@ -324,28 +335,31 @@ class Point extends Pointlike
 			Math.floor oldX
 			Math.floor oldY
 		]
-	toSvg: (f) ->
+	toSvg: (f = MDS.editFrame) ->
 		[x, y] = @get f
 		if @parent?
 			"<circle cx='#{x}' cy='#{y}' r='5' fill='transparent' stroke='#00f'/>"
 		else
-			"<circle cx='#{x}' cy='#{y}' r='2' fill='#f00'/>"
-	updateSvg: (svg, f) ->
+			"<circle cx='#{x}' cy='#{y}' r='2' fill='##{RGBToHex @getColor f}'/>"
+	updateSvg: (svg, f = MDS.editFrame) ->
 		[x, y] = @get f
 		svg.attr
 			cx: x
 			cy: y
-	toTr: (f) ->
+		unless @parent?
+			svg.attr
+				fill: '#' + RGBToHex @getColor f
+	toTr: (f = MDS.editFrame) ->
 		[x, y] = @get f
 		"<tr><td class='html-id' title='点(#{x}, #{y})'>#{@html_id}</td>
 			 <td class='shape-type' title='(#{x}, #{y})'>Point</td></tr>"
-	updateTr: (tr, f) ->
+	updateTr: (tr, f = MDS.editFrame) ->
 		[x, y] = @get f
 		tr.children '.html-id'
 			.attr title: "点(#{x}, #{y})"
 		tr.children '.shape-type'
 			.attr title: "(#{x}, #{y})"
-	coverRect: (f) ->
+	coverRect: (f = MDS.editFrame) ->
 		[x, y] = @get f
 		if @parent?
 			[
@@ -363,33 +377,32 @@ class Line extends Shape
 		super parent, index
 		@s = new Point this, 0
 		@e = new Point this, 1
-	toSvg: (f) ->
+	toSvg: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
-		"<line x1='#{sx}' y1='#{sy}' x2='#{ex}' y2='#{ey}' fill='none' stroke='#f00'/>"
-	updateSvg: (svg, f) ->
+		"<line x1='#{sx}' y1='#{sy}' x2='#{ex}' y2='#{ey}' fill='none' stroke='##{RGBToHex @getColor f}'/>"
+	updateSvg: (svg, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
-		[r, g, b] = @getColor f
 		svg.attr
 			x1: sx
 			y1: sy
 			x2: ex
 			y2: ey
-			stroke: "#" + ('0' + r.toString 16).slice(-2) + ('0' + g.toString 16).slice(-2) + ('0' + b.toString 16).slice(-2)
-	toTr: (f) ->
+			stroke: '#' + RGBToHex @getColor f
+	toTr: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
 		"<tr><td class='html-id' title='直線((#{sx}, #{sy}) (#{ex}, #{ey}))'>#{@html_id}</td>
 			 <td class='shape-type' title='(#{sx}, #{sy}) (#{ex}, #{ey})'>Line</td></tr>"
-	updateTr: (tr, f) ->
+	updateTr: (tr, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
 		tr.children '.html-id'
 			.attr title: "直線((#{sx}, #{sy}) (#{ex}, #{ey}))"
 		tr.children '.shape-type'
 			.attr title: "((#{sx}, #{sy}) (#{ex}, #{ey}))"
-	coverRect: (f) ->
+	coverRect: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
 		[
@@ -404,29 +417,28 @@ class Bezeir extends Shape
 		@c1 = new Point this, 1
 		@c2 = new Point this, 2
 		@e = new Point this, 3
-	toSvg: (f) ->
+	toSvg: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[c1x, c1y] = @c1.get f
 		[c2x, c2y] = @c2.get f
 		[ex, ey] = @e.get f
-		"<path d='M #{sx} #{sy} C #{c1x} #{c1y} #{c2x} #{c2y} #{ex} #{ey}' fill='none' stroke='#f00'/>"
-	updateSvg: (svg, f) ->
+		"<path d='M #{sx} #{sy} C #{c1x} #{c1y} #{c2x} #{c2y} #{ex} #{ey}' fill='none' stroke='##{RGBToHex @getColor f}'/>"
+	updateSvg: (svg, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[c1x, c1y] = @c1.get f
 		[c2x, c2y] = @c2.get f
 		[ex, ey] = @e.get f
-		[r, g, b] = @getColor f
 		svg.attr
 			d: "M #{sx} #{sy} C #{c1x} #{c1y} #{c2x} #{c2y} #{ex} #{ey}"
-			stroke: "#" + ('0' + r.toString 16).slice(-2) + ('0' + g.toString 16).slice(-2) + ('0' + b.toString 16).slice(-2)
-	toTr: (f) ->
+			stroke: '#' + RGBToHex @getColor f
+	toTr: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[c1x, c1y] = @c1.get f
 		[c2x, c2y] = @c2.get f
 		[ex, ey] = @e.get f
 		"<tr><td class='html-id' title='3次ベジェ曲線((#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey}))'>#{@html_id}</td>
 			 <td class='shape-type' title='(#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey})'>Bezeir</td></tr>"
-	updateTr: (tr, f) ->
+	updateTr: (tr, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[c1x, c1y] = @c1.get f
 		[c2x, c2y] = @c2.get f
@@ -435,7 +447,7 @@ class Bezeir extends Shape
 			.attr title: "3次ベジェ曲線((#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey}))"
 		tr.children '.shape-type'
 			.attr title: "(#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey})"
-	coverRect: (f) ->
+	coverRect: (f = MDS.editFrame) ->
 		minmax = (p0, p1, p2, p3) ->
 			[a, b, c, d] = [-(p0 - 3 * p1 + 3 * p2 - p3), 3 * p0 - 6 * p1 + 3 * p2, -(3 * p0 - 3 * p1), p0]
 			f = (k) -> (a * k * k * k) + (b * k * k) + (c * k) + d
@@ -505,7 +517,8 @@ $ ->
 		.ColorPicker
 			color: '#f00'
 			onSubmit: (hsb, hex, rgb) ->
-				MDS.selectedTop.setColor MDS.editFrame, rgb.r, rgb.g, rgb.b
+				MDS.selectedTop.setColor rgb.r, rgb.g, rgb.b
+				MDS.reload MDS.selectedTop
 	$ '#move-point'
 		.click ->
 			MDS.setMode 'move'
