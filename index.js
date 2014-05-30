@@ -850,13 +850,13 @@
       return MDS.setFrame(frame = $(this).val());
     });
     $('#animation-start').click(function() {
-      $('.anime-tool').removeClass('tool-selected');
       $('#animation-start').css({
         display: 'none'
-      });
+      }).addClass('tool-selected');
       $('#animation-pause').css({
         display: 'inline-block'
-      });
+      }).addClass('tool-selected');
+      $('#animation-stop').removeClass('tool-selected');
       return interval = setInterval((function(_this) {
         return function() {
           frame++;
@@ -865,8 +865,14 @@
             MDS.setFrame(0);
             if (!isLooping) {
               clearInterval(interval);
-              $(_this).removeClass('tool-selected');
-              return $('#animation-pause').addClass('tool-selected');
+              $('#animation-start').css({
+                display: 'inline-block'
+              }).removeClass('tool-selected');
+              $('#animation-pause').css({
+                display: 'none'
+              }).removeClass('tool-selected');
+              $('#animation-stop').addClass('tool-selected');
+              return $('#animation-pause');
             }
           } else {
             return MDS.setFrame(frame);
@@ -875,23 +881,23 @@
       })(this), 1000 / FPS);
     });
     $('#animation-pause').click(function() {
-      $('.anime-tool').removeClass('tool-selected');
       $('#animation-start').css({
         display: 'inline-block'
-      });
+      }).addClass('tool-selected');
       $('#animation-pause').css({
         display: 'none'
-      });
+      }).addClass('tool-selected');
+      $('#animation-stop').removeClass('tool-selected');
       return clearInterval(interval);
     });
     $('#animation-stop').click(function() {
-      $(this).addClass('tool-selected');
       $('#animation-start').css({
         display: 'inline-block'
-      });
+      }).removeClass('tool-selected');
       $('#animation-pause').css({
         display: 'none'
-      });
+      }).removeClass('tool-selected');
+      $('#animation-stop').addClass('tool-selected');
       clearInterval(interval);
       frame = 0;
       return MDS.setFrame(0);

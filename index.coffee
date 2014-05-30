@@ -539,12 +539,14 @@ $ ->
 			MDS.setFrame frame = $(@).val()
 	$ '#animation-start'
 		.click ->
-			$ '.anime-tool'
-				.removeClass 'tool-selected'
 			$ '#animation-start'
 				.css display: 'none'
+				.addClass 'tool-selected'
 			$ '#animation-pause'
 				.css display: 'inline-block'
+				.addClass 'tool-selected'
+			$ '#animation-stop'
+				.removeClass 'tool-selected'
 			interval =
 				setInterval =>
 					frame++
@@ -553,30 +555,39 @@ $ ->
 						MDS.setFrame 0
 						unless isLooping
 							clearInterval interval
-							$ @
+							$ '#animation-start'
+								.css display: 'inline-block'
 								.removeClass 'tool-selected'
 							$ '#animation-pause'
+								.css display: 'none'
+								.removeClass 'tool-selected'
+							$ '#animation-stop'
 								.addClass 'tool-selected'
+							$ '#animation-pause'
 					else
 						MDS.setFrame frame
 				, 1000 / FPS
 	$ '#animation-pause'
 		.click ->
-			$ '.anime-tool'
-				.removeClass 'tool-selected'
 			$ '#animation-start'
 				.css display: 'inline-block'
+				.addClass 'tool-selected'
 			$ '#animation-pause'
 				.css display: 'none'
+				.addClass 'tool-selected'
+			$ '#animation-stop'
+				.removeClass 'tool-selected'
 			clearInterval interval
 	$ '#animation-stop'
 		.click ->
-			$ @
-				.addClass 'tool-selected'
 			$ '#animation-start'
 				.css display: 'inline-block'
+				.removeClass 'tool-selected'
 			$ '#animation-pause'
 				.css display: 'none'
+				.removeClass 'tool-selected'
+			$ '#animation-stop'
+				.addClass 'tool-selected'
 			clearInterval interval
 			frame = 0
 			MDS.setFrame 0
