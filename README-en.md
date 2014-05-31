@@ -4,7 +4,7 @@ Yet another animation creation software
 [日本語バージョン](README-ja.md)
 
 Latest version: 0.0.α (Last update: 2014-05-29 JST)  
-asterisk In alpha version we update it many times, so there's no detailed version of it.  
+\asterisk In alpha version we update it many times, so there's no detailed version of it.  
 
 ## Demo
 <http://akouryy.net/program/js/mds/> (It provides only Japanese version yet)  
