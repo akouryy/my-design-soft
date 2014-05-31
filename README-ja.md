@@ -1,7 +1,7 @@
 # My Design Soft
 
 アニメーション作成ソフト的な何か  
-English: comming soon...  
+English: I'm going to add english README today(JST).  
 
 最新バージョン: 0.0.α (最終更新: 2014-05-29 JST)  
 ※αは細かい変更を幾度となく加えるので詳細バージョンは存在しません。  
