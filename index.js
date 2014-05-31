@@ -70,15 +70,12 @@
       }
     },
     prepareTr: function(shape, isAnime) {
-      var i, tr, _, _fn, _i, _ref, _ref1;
+      var i, td, tr, _, _fn, _i, _ref, _ref1;
       tr = $(shape.toTr());
       if (isAnime) {
         tr.attr('id', "anime-" + shape.html_id);
         _fn = (function(_this) {
           return function(i, td) {
-            td.css({
-              width: "" + (92 / (view_sec * FPS)) + "%"
-            });
             if (i === _this.editFrame) {
               td.addClass('anime-grid-editing');
             }
@@ -128,6 +125,8 @@
             tr.children("[data-frame=" + i + "]").addClass('grid-control-point');
           }
         }
+        td = $("<td class='anime-grid' data-frame='100'></td>");
+        tr.append(td);
       } else {
         tr.attr('id', "prop-" + shape.html_id);
         tr.append($('<td/>'));
@@ -845,7 +844,7 @@
       return $(this).addClass('tool-selected');
     });
     $('#animation-range').attr({
-      max: view_sec * FPS - 1
+      max: view_sec * FPS
     }).change(function() {
       return MDS.setFrame(frame = $(this).val());
     });
@@ -924,10 +923,8 @@
       return MDS.onClick(ev);
     });
     _results = [];
-    for (i = _i = 0, _ref = view_sec * FPS; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-      _results.push($("<th data-frame=" + i + " " + (i === MDS.editFrame ? "class='anime-grid-editing'" : void 0) + " " + (i % FPS === 0 ? "class='bold-grid-line'>" + i : i % (FPS / 2) === 0 ? "class='thin-grid-line'>" + i : ">") + "</th>").css({
-        width: "" + (92 / (view_sec * FPS)) + "%"
-      }).appendTo($('#animations .header')));
+    for (i = _i = 0, _ref = view_sec * FPS; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      _results.push($("<th data-frame=" + i + " " + (i === MDS.editFrame ? "class='anime-grid-editing'" : void 0) + " " + (i % FPS === 0 ? "class='bold-grid-line'>" + i : i % (FPS / 2) === 0 ? "class='thin-grid-line'>" + i : ">") + "</th>").appendTo($('#animations .header')));
     }
     return _results;
   });

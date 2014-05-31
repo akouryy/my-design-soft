@@ -122,6 +122,12 @@ body{
 	border-left: 2px solid #999;
 	width: 4%;
 }
+#animations .anime-grid:last-of-type{
+	background: rgba(0, 0, 0, 0.2);
+}
+#animations th[data-frame]:last-of-type{
+	width: 2%;
+}
 #animations .bold-grid-line{
 	border-left: 1px solid #000;
 }

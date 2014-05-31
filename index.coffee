@@ -62,7 +62,6 @@ MDS =
 			tr.attr 'id', "anime-#{shape.html_id}"
 			for i in [0 ... view_sec * FPS]
 				do (i, td = $ "<td class='anime-grid' data-frame='#{i}'>　</td>") =>
-					td.css width: "#{92 / (view_sec * FPS)}%"
 					if i == @editFrame
 						td.addClass 'anime-grid-editing'
 					if i % FPS == 0
@@ -95,6 +94,8 @@ MDS =
 				for i, _ of shape.ps
 					tr.children "[data-frame=#{i}]"
 						.addClass 'grid-control-point'
+			td = $ "<td class='anime-grid' data-frame='100'></td>"
+			tr.append td
 		else
 			tr.attr 'id', "prop-#{shape.html_id}"
 			tr.append $ '<td/>'
@@ -534,7 +535,7 @@ $ ->
 			$ @
 				.addClass 'tool-selected'
 	$ '#animation-range'
-		.attr max: view_sec * FPS - 1
+		.attr max: view_sec * FPS
 		.change ->
 			MDS.setFrame frame = $(@).val()
 	$ '#animation-start'
@@ -615,7 +616,7 @@ $ ->
 	$ '#canvas'
 		.click (ev) ->
 			MDS.onClick ev
-	for i in [0 ... view_sec * FPS]
+	for i in [0 .. view_sec * FPS]
 		$ "<th data-frame=#{i} #{
 			if i == MDS.editFrame
 				"class='anime-grid-editing'"
@@ -627,5 +628,4 @@ $ ->
 			else
 				">"
 		}</th>"
-			.css width: "#{92 / (view_sec * FPS)}%"
 			.appendTo $ '#animations .header'
