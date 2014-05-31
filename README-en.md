@@ -4,7 +4,7 @@ Yet another animation creation software
 [日本語バージョン](README-ja.md)
 
 Latest version: 0.0.α (Last update: 2014-05-29 JST)  
-\* In alpha version we update it many times, so there's no detailed version of it.  
+\*In alpha version we update it many times, so there's no detailed version of it.  
 
 ## Demo
 <http://akouryy.net/program/js/mds/> (It provides only Japanese version yet)  
@@ -16,5 +16,5 @@ Latest version: 0.0.α (Last update: 2014-05-29 JST)
 * You can move points.
 * You can move the vertices of straight lines and Bezier curves.
 * You can change the colors of points, straight lines, and Bezier curves.
-* Adding the control points to the animation, you can change the colors and positions of the objects gradually.
+* You can change the colors and positions of the objects gradually by adding the control points to the animation.
 * You can delete the control points of animation.
