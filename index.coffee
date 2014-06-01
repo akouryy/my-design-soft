@@ -25,7 +25,8 @@ MDS =
 	handlingShape: null
 	nextIndex: 0
 	editFrame: 0
-	AnimeGridSize: 1
+	animationFrameLength : 80
+	frameShowStart : 0
 	add: (shape) ->
 		@shapeList.push shape
 		$s = $ shape.toSvg()
@@ -60,8 +61,9 @@ MDS =
 		tr = $ shape.toTr()
 		if isAnime
 			tr.attr 'id', "anime-#{shape.html_id}"
-			for i in [0 ... view_sec * FPS]
-				do (i, td = $ "<td class='anime-grid' data-frame='#{i}'>　</td>") =>
+			for i in [@frameShowStart ... @frameShowStart + @animationFrameLength]
+				do (td = $ "<td class='anime-grid' data-frame='#{i}'>　</td>") =>
+					td.data frame: i
 					if i == @editFrame
 						td.addClass 'anime-grid-editing'
 					if i % FPS == 0
@@ -69,21 +71,21 @@ MDS =
 					else if i % (FPS / 2) == 0
 						td.addClass 'thin-grid-line'
 					td
-						.click =>
-							@setFrame i
+						.click ->
+							MDS.setFrame td.data 'frame'
 						.contextMenu 'control-point-menu',
 							bindings:
-								'select-object-frame': (t) =>
+								'select-object-frame': =>
 									@select shape
-									@setFrame i
-								'select-object': (t) =>
+									@setFrame td.data 'frame'
+								'select-object': =>
 									@select shape
-								'select-frame': (t) =>
-									@setFrame i
-								'delete-object': (t) =>
+								'select-frame': =>
+									@setFrame td.data 'frame'
+								'delete-object': =>
 									@remove shape
-								'delete-control-point': (t) =>
-									delete shape.ps[i]
+								'delete-control-point': =>
+									delete shape.ps[td.data 'frame']
 									td.removeClass 'grid-control-point'
 							menuStyle:
 								'border-radius': '1px'
@@ -94,8 +96,8 @@ MDS =
 				for i, _ of shape.ps
 					tr.children "[data-frame=#{i}]"
 						.addClass 'grid-control-point'
-			td = $ "<td class='anime-grid' data-frame='100'></td>"
-			tr.append td
+#			td = $ "<td class='anime-grid' data-frame='???'></td>"
+#			tr.append td
 		else
 			tr.attr 'id', "prop-#{shape.html_id}"
 			tr.append $ '<td/>'
@@ -132,6 +134,24 @@ MDS =
 				y: y1
 				width: x2 - x1
 				height: y2 - y1
+		$ 'th[data-frame]'
+			.remove()
+		for i in [@frameShowStart ... @frameShowStart + @animationFrameLength]
+			$ "<th data-frame=#{i} class='#{
+				if i == MDS.editFrame
+					'anime-grid-editing '
+				else
+					''
+			} #{
+				if i % FPS == 0
+					"bold-grid-line'>#{i}"
+				else if i % (FPS / 2) == 0
+					"thin-grid-line'>#{i}"
+				else
+					"'>"
+			}</th>"
+				.data frame: i
+				.appendTo $ '#animations .header'
 		propTr = @prepareTr shape, false
 		animeTr = @prepareTr shape, true
 		if shape.selected
@@ -268,6 +288,12 @@ MDS =
 					y: y1
 					width: x2 - x1
 					height: y2 - y1
+	moveStartFrame: (d) ->
+		unless 0 <= @frameShowStart + d <= view_sec * FPS - @animationFrameLength
+			return false
+		@frameShowStart += d
+		@reload s for s in @shapeList
+		true
 class Shape
 	visible: false
 	selected: false
@@ -613,19 +639,30 @@ $ ->
 	$ '#remove'
 		.click ->
 			MDS.remove MDS.selectedMainly
+	$ '#prev-frame'
+		.click ->
+			unless MDS.moveStartFrame -1
+				alert '最初です'
+	$ '#next-frame'
+		.click ->
+			unless MDS.moveStartFrame +1
+				alert '最後です'
 	$ '#canvas'
 		.click (ev) ->
 			MDS.onClick ev
-	for i in [0 .. view_sec * FPS]
-		$ "<th data-frame=#{i} #{
+	for i in [0 ... MDS.animationFrameLength]
+		$ "<th data-frame=#{i} class='#{
 			if i == MDS.editFrame
-				"class='anime-grid-editing'"
+				'anime-grid-editing '
+			else
+				''
 		} #{
 			if i % FPS == 0
-				"class='bold-grid-line'>#{i}"
+				"bold-grid-line'>#{i}"
 			else if i % (FPS / 2) == 0
-				"class='thin-grid-line'>#{i}"
+				"thin-grid-line'>#{i}"
 			else
-				">"
+				"'>"
 		}</th>"
+			.data frame: i
 			.appendTo $ '#animations .header'

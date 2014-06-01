@@ -37,7 +37,8 @@
     handlingShape: null,
     nextIndex: 0,
     editFrame: 0,
-    AnimeGridSize: 1,
+    animationFrameLength: 80,
+    frameShowStart: 0,
     add: function(shape) {
       var $s, animeTr, propTr, s, x1, x2, y1, y2, _i, _len, _ref, _ref1, _ref2, _ref3;
       this.shapeList.push(shape);
@@ -70,12 +71,15 @@
       }
     },
     prepareTr: function(shape, isAnime) {
-      var i, td, tr, _, _fn, _i, _ref, _ref1;
+      var i, tr, _, _fn, _i, _ref, _ref1, _ref2;
       tr = $(shape.toTr());
       if (isAnime) {
         tr.attr('id', "anime-" + shape.html_id);
         _fn = (function(_this) {
-          return function(i, td) {
+          return function(td) {
+            td.data({
+              frame: i
+            });
             if (i === _this.editFrame) {
               td.addClass('anime-grid-editing');
             }
@@ -85,24 +89,24 @@
               td.addClass('thin-grid-line');
             }
             td.click(function() {
-              return _this.setFrame(i);
+              return MDS.setFrame(td.data('frame'));
             }).contextMenu('control-point-menu', {
               bindings: {
-                'select-object-frame': function(t) {
+                'select-object-frame': function() {
                   _this.select(shape);
-                  return _this.setFrame(i);
+                  return _this.setFrame(td.data('frame'));
                 },
-                'select-object': function(t) {
+                'select-object': function() {
                   return _this.select(shape);
                 },
-                'select-frame': function(t) {
-                  return _this.setFrame(i);
+                'select-frame': function() {
+                  return _this.setFrame(td.data('frame'));
                 },
-                'delete-object': function(t) {
+                'delete-object': function() {
                   return _this.remove(shape);
                 },
-                'delete-control-point': function(t) {
-                  delete shape.ps[i];
+                'delete-control-point': function() {
+                  delete shape.ps[td.data('frame')];
                   return td.removeClass('grid-control-point');
                 }
               },
@@ -115,18 +119,16 @@
             return tr.append(td);
           };
         })(this);
-        for (i = _i = 0, _ref = view_sec * FPS; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-          _fn(i, $("<td class='anime-grid' data-frame='" + i + "'>　</td>"));
+        for (i = _i = _ref = this.frameShowStart, _ref1 = this.frameShowStart + this.animationFrameLength; _ref <= _ref1 ? _i < _ref1 : _i > _ref1; i = _ref <= _ref1 ? ++_i : --_i) {
+          _fn($("<td class='anime-grid' data-frame='" + i + "'>　</td>"));
         }
         if (shape.ps != null) {
-          _ref1 = shape.ps;
-          for (i in _ref1) {
-            _ = _ref1[i];
+          _ref2 = shape.ps;
+          for (i in _ref2) {
+            _ = _ref2[i];
             tr.children("[data-frame=" + i + "]").addClass('grid-control-point');
           }
         }
-        td = $("<td class='anime-grid' data-frame='100'></td>");
-        tr.append(td);
       } else {
         tr.attr('id', "prop-" + shape.html_id);
         tr.append($('<td/>'));
@@ -184,7 +186,7 @@
       }
     },
     reload: function(shape) {
-      var animeTr, propTr, r, x1, x2, y1, y2, _ref, _ref1, _ref2;
+      var animeTr, i, propTr, r, x1, x2, y1, y2, _i, _ref, _ref1, _ref2, _ref3, _ref4;
       $("#shape-" + shape.html_id).replaceWith($(shape.toSvg()).attr('id', "shape-" + shape.html_id));
       r = shape.coverRect();
       _ref = shape.coverRect(), (_ref1 = _ref[0], x1 = _ref1[0], y1 = _ref1[1]), (_ref2 = _ref[1], x2 = _ref2[0], y2 = _ref2[1]);
@@ -194,6 +196,12 @@
         width: x2 - x1,
         height: y2 - y1
       });
+      $('th[data-frame]').remove();
+      for (i = _i = _ref3 = this.frameShowStart, _ref4 = this.frameShowStart + this.animationFrameLength; _ref3 <= _ref4 ? _i < _ref4 : _i > _ref4; i = _ref3 <= _ref4 ? ++_i : --_i) {
+        $("<th data-frame=" + i + " class='" + (i === MDS.editFrame ? 'anime-grid-editing ' : '') + " " + (i % FPS === 0 ? "bold-grid-line'>" + i : i % (FPS / 2) === 0 ? "thin-grid-line'>" + i : "'>") + "</th>").data({
+          frame: i
+        }).appendTo($('#animations .header'));
+      }
       propTr = this.prepareTr(shape, false);
       animeTr = this.prepareTr(shape, true);
       if (shape.selected) {
@@ -391,6 +399,19 @@
         }));
       }
       return _results;
+    },
+    moveStartFrame: function(d) {
+      var s, _i, _len, _ref, _ref1;
+      if (!((0 <= (_ref = this.frameShowStart + d) && _ref <= view_sec * FPS - this.animationFrameLength))) {
+        return false;
+      }
+      this.frameShowStart += d;
+      _ref1 = this.shapeList;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        s = _ref1[_i];
+        this.reload(s);
+      }
+      return true;
     }
   };
 
@@ -919,12 +940,24 @@
     $('#remove').click(function() {
       return MDS.remove(MDS.selectedMainly);
     });
+    $('#prev-frame').click(function() {
+      if (!MDS.moveStartFrame(-1)) {
+        return alert('最初です');
+      }
+    });
+    $('#next-frame').click(function() {
+      if (!MDS.moveStartFrame(+1)) {
+        return alert('最後です');
+      }
+    });
     $('#canvas').click(function(ev) {
       return MDS.onClick(ev);
     });
     _results = [];
-    for (i = _i = 0, _ref = view_sec * FPS; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-      _results.push($("<th data-frame=" + i + " " + (i === MDS.editFrame ? "class='anime-grid-editing'" : void 0) + " " + (i % FPS === 0 ? "class='bold-grid-line'>" + i : i % (FPS / 2) === 0 ? "class='thin-grid-line'>" + i : ">") + "</th>").appendTo($('#animations .header')));
+    for (i = _i = 0, _ref = MDS.animationFrameLength; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      _results.push($("<th data-frame=" + i + " class='" + (i === MDS.editFrame ? 'anime-grid-editing ' : '') + " " + (i % FPS === 0 ? "bold-grid-line'>" + i : i % (FPS / 2) === 0 ? "thin-grid-line'>" + i : "'>") + "</th>").data({
+        frame: i
+      }).appendTo($('#animations .header')));
     }
     return _results;
   });

@@ -120,14 +120,17 @@ body{
 }
 #animations .shape-type{
 	border-left: 2px solid #999;
+	border-right: 2px solid #000;
 	width: 4%;
 }
+/*
 #animations .anime-grid:last-of-type{
 	background: rgba(0, 0, 0, 0.2);
 }
 #animations th[data-frame]:last-of-type{
 	width: 2%;
 }
+*/
 #animations .bold-grid-line{
 	border-left: 1px solid #000;
 }
