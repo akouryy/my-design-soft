@@ -12,7 +12,6 @@ RGBToHex = (rgb) ->
 		if val.length == 1
 			hex[i] = "0#{val}"
 	hex.join ''
-
 FPS = 10
 view_sec = 10
 MDS =
