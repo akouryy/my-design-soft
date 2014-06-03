@@ -231,15 +231,20 @@ class Bezeir extends Shape
 
 	coverRect: (f = MDS.editFrame) ->
 		minmax = (p0, p1, p2, p3) ->
-			[a, b, c, d] = [-(p0 - 3 * p1 + 3 * p2 - p3), 3 * p0 - 6 * p1 + 3 * p2, -(3 * p0 - 3 * p1), p0]
-			f = (k) -> (a * k * k * k) + (b * k * k) + (c * k) + d
+			[a, b, c, d] = [
+				-(p0 - 3 * p1 + 3 * p2 - p3)
+				3 * p0 - 6 * p1 + 3 * p2
+				-(3 * p0 - 3 * p1)
+				p0
+			]
+			f = (k) -> (a * k ** 3) + (b * k ** 2) + (c * k) + d
 			max = Math.max f(0), f(1)
 			min = Math.min f(0), f(1)
 			if a != 0
-				D_ = b * b - 3 * a * c
+				D_ = b ** 2 - 3 * a * c
 				if D_ > 0
-					α = (-b - Math.sqrt b * b - 3 * a * c) / (3 * a)
-					β = (-b + Math.sqrt b * b - 3 * a * c) / (3 * a)
+					α = (-b - Math.sqrt b ** 2 - 3 * a * c) / (3 * a)
+					β = (-b + Math.sqrt b ** 2 - 3 * a * c) / (3 * a)
 					if 0 <= α <= 1
 						max = Math.max max, f α
 						min = Math.min min, f α

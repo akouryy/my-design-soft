@@ -780,15 +780,15 @@
         var D_, a, b, c, d, max, min, t, α, β, _ref;
         _ref = [-(p0 - 3 * p1 + 3 * p2 - p3), 3 * p0 - 6 * p1 + 3 * p2, -(3 * p0 - 3 * p1), p0], a = _ref[0], b = _ref[1], c = _ref[2], d = _ref[3];
         f = function(k) {
-          return (a * k * k * k) + (b * k * k) + (c * k) + d;
+          return (a * Math.pow(k, 3)) + (b * Math.pow(k, 2)) + (c * k) + d;
         };
         max = Math.max(f(0), f(1));
         min = Math.min(f(0), f(1));
         if (a !== 0) {
-          D_ = b * b - 3 * a * c;
+          D_ = Math.pow(b, 2) - 3 * a * c;
           if (D_ > 0) {
-            α = (-b - Math.sqrt(b * b - 3 * a * c)) / (3 * a);
-            β = (-b + Math.sqrt(b * b - 3 * a * c)) / (3 * a);
+            α = (-b - Math.sqrt(Math.pow(b, 2) - 3 * a * c)) / (3 * a);
+            β = (-b + Math.sqrt(Math.pow(b, 2) - 3 * a * c)) / (3 * a);
             if ((0 <= α && α <= 1)) {
               max = Math.max(max, f(α));
               min = Math.min(min, f(α));
