@@ -4,12 +4,12 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+  pass = void 0;
+
   debug = function(x) {
     alert(x);
     return console.log(x);
   };
-
-  pass = void 0;
 
   RGBToHex = function(rgb) {
     var hex, i, val, _i, _len;

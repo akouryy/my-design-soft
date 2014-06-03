@@ -1,7 +1,11 @@
+pass = undefined
+
+## debug :: (String | Exception) -> IO ()
 debug = (x) ->
 	alert x
 	console.log x
-pass = undefined
+
+## RGBToHex :: {r: Int, g: Int, b: Int} -> String
 RGBToHex = (rgb) ->
 	hex = [
 		rgb.r.toString 16

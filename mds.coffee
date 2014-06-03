@@ -1,17 +1,32 @@
 FPS = 10
+
 view_sec = 10
+
 MDS =
+
 	shapeTypes: {}
+
 	selectedMainly: null
+
 	selectedTop: null
+
 	shapeList: []
+
 	html_id: 0
+
 	mode: 'none'
+
 	handlingShape: null
+
 	nextIndex: 0
+
 	editFrame: 0
+
 	animationFrameLength : 80
+
 	frameShowStart : 0
+
+	## add :: Shape -> IO ()
 	add: (shape) ->
 		@shapeList.push shape
 		$s = $ shape.toSvg()
@@ -42,6 +57,8 @@ MDS =
 			.appendTo '#canvas svg'
 		@hide s for s in shape.children
 		@select shape unless shape.parent?
+
+	## prepareTr :: Shape -> Boolean -> $
 	prepareTr: (shape, isAnime) ->
 		tr = $ shape.toTr()
 		if isAnime
@@ -101,6 +118,8 @@ MDS =
 				@toggleSelect shape
 				false
 		tr
+
+	## remove :: Shape -> Maybe Boolean -> IO ()
 	remove: (shape, parentDone) ->
 		@shapeList = (s for s in @shapeList when s != shape)
 		$ "#prop-#{shape.html_id}, #anime-#{shape.html_id}, #shape-#{shape.html_id}, #select-#{shape.html_id}"
@@ -108,6 +127,8 @@ MDS =
 		@remove s, true for s in shape.children
 		if shape.parent?
 			@remove shape.parent unless parentDone?
+
+	## reload :: Shape -> IO ()
 	reload: (shape) ->
 		$ "#shape-#{shape.html_id}"
 			.replaceWith $(shape.toSvg()).attr 'id', "shape-#{shape.html_id}"
@@ -148,9 +169,13 @@ MDS =
 			.replaceWith animeTr
 		@reload shape.parent if shape.parent?
 		@refresh()
+
+	## refresh :: IO ()
 	refresh: ->
 		$ '#canvas'
 			.html $('#canvas').html()
+
+	## select :: Shape -> IO ()
 	select: (shape) ->
 		try
 			@unselectAll shape.parent
@@ -166,6 +191,8 @@ MDS =
 			@show s for s in shape.children
 		catch err
 			debug err
+
+	## unselect :: Shape -> IO ()
 	unselect: (shape) ->
 		try
 			if shape == @selectedMainly
@@ -183,24 +210,34 @@ MDS =
 			@hide s for s in shape.children
 		catch err
 			debug err
+
+	## toggleSelect :: Shape -> IO ()
 	toggleSelect: (shape) ->
 		if shape.selected
 			@unselect shape
 		else
 			@select shape
+
+	## unselectAll :: Maybe Shape -> IO ()
 	unselectAll: (select) ->
 		try
 			@unselect shape for shape in @shapeList when shape.selected and shape != select
 		catch err
 			debug err
+
+	## show :: Shape -> IO ()
 	show: (shape) ->
 		shape.visible = true
 		$ "#shape-#{shape.html_id}, #prop-#{shape.html_id}, #anime-#{shape.html_id}"
 			.css 'display', 'table-row'
+
+	## hide :: Shape -> IO ()
 	hide: (shape) ->
 		shape.visible = false
 		$ "#shape-#{shape.html_id}, #prop-#{shape.html_id}, #anime-#{shape.html_id}"
 			.css 'display', 'none'
+
+	## onClick :: Event -> IO ()
 	onClick: (ev) ->
 		try
 			switch @mode
@@ -234,6 +271,8 @@ MDS =
 					@refresh()
 		catch err
 			debug err
+
+	## setMode :: ('none' | 'point' | 'line' | 'bezeir' | 'anime') -> IO ()
 	setMode: (mode) ->
 		switch @mode
 			when 'none'
@@ -255,6 +294,8 @@ MDS =
 			when 'anime'
 				$ '#animations'
 					.show 1000
+
+	## setFrame :: Int -> IO ()
 	setFrame: (frame) ->
 		@editFrame = frame
 		$ '#animation-range'
@@ -273,6 +314,8 @@ MDS =
 					y: y1
 					width: x2 - x1
 					height: y2 - y1
+
+	## moveStartFrame :: Int -> IO ()
 	moveStartFrame: (d) ->
 		unless 0 <= @frameShowStart + d <= view_sec * FPS - @animationFrameLength
 			return false

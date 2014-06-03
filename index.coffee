@@ -1,7 +1,11 @@
+pass = undefined
+
+## debug :: (String | Exception) -> IO ()
 debug = (x) ->
 	alert x
 	console.log x
-pass = undefined
+
+## RGBToHex :: {r: Int, g: Int, b: Int} -> String
 RGBToHex = (rgb) ->
 	hex = [
 		rgb.r.toString 16
@@ -13,19 +17,34 @@ RGBToHex = (rgb) ->
 			hex[i] = "0#{val}"
 	hex.join ''
 FPS = 10
+
 view_sec = 10
+
 MDS =
+
 	shapeTypes: {}
+
 	selectedMainly: null
+
 	selectedTop: null
+
 	shapeList: []
+
 	html_id: 0
+
 	mode: 'none'
+
 	handlingShape: null
+
 	nextIndex: 0
+
 	editFrame: 0
+
 	animationFrameLength : 80
+
 	frameShowStart : 0
+
+	## add :: Shape -> IO ()
 	add: (shape) ->
 		@shapeList.push shape
 		$s = $ shape.toSvg()
@@ -56,6 +75,8 @@ MDS =
 			.appendTo '#canvas svg'
 		@hide s for s in shape.children
 		@select shape unless shape.parent?
+
+	## prepareTr :: Shape -> Boolean -> $
 	prepareTr: (shape, isAnime) ->
 		tr = $ shape.toTr()
 		if isAnime
@@ -115,6 +136,8 @@ MDS =
 				@toggleSelect shape
 				false
 		tr
+
+	## remove :: Shape -> Maybe Boolean -> IO ()
 	remove: (shape, parentDone) ->
 		@shapeList = (s for s in @shapeList when s != shape)
 		$ "#prop-#{shape.html_id}, #anime-#{shape.html_id}, #shape-#{shape.html_id}, #select-#{shape.html_id}"
@@ -122,6 +145,8 @@ MDS =
 		@remove s, true for s in shape.children
 		if shape.parent?
 			@remove shape.parent unless parentDone?
+
+	## reload :: Shape -> IO ()
 	reload: (shape) ->
 		$ "#shape-#{shape.html_id}"
 			.replaceWith $(shape.toSvg()).attr 'id', "shape-#{shape.html_id}"
@@ -162,9 +187,13 @@ MDS =
 			.replaceWith animeTr
 		@reload shape.parent if shape.parent?
 		@refresh()
+
+	## refresh :: IO ()
 	refresh: ->
 		$ '#canvas'
 			.html $('#canvas').html()
+
+	## select :: Shape -> IO ()
 	select: (shape) ->
 		try
 			@unselectAll shape.parent
@@ -180,6 +209,8 @@ MDS =
 			@show s for s in shape.children
 		catch err
 			debug err
+
+	## unselect :: Shape -> IO ()
 	unselect: (shape) ->
 		try
 			if shape == @selectedMainly
@@ -197,24 +228,34 @@ MDS =
 			@hide s for s in shape.children
 		catch err
 			debug err
+
+	## toggleSelect :: Shape -> IO ()
 	toggleSelect: (shape) ->
 		if shape.selected
 			@unselect shape
 		else
 			@select shape
+
+	## unselectAll :: Maybe Shape -> IO ()
 	unselectAll: (select) ->
 		try
 			@unselect shape for shape in @shapeList when shape.selected and shape != select
 		catch err
 			debug err
+
+	## show :: Shape -> IO ()
 	show: (shape) ->
 		shape.visible = true
 		$ "#shape-#{shape.html_id}, #prop-#{shape.html_id}, #anime-#{shape.html_id}"
 			.css 'display', 'table-row'
+
+	## hide :: Shape -> IO ()
 	hide: (shape) ->
 		shape.visible = false
 		$ "#shape-#{shape.html_id}, #prop-#{shape.html_id}, #anime-#{shape.html_id}"
 			.css 'display', 'none'
+
+	## onClick :: Event -> IO ()
 	onClick: (ev) ->
 		try
 			switch @mode
@@ -248,6 +289,8 @@ MDS =
 					@refresh()
 		catch err
 			debug err
+
+	## setMode :: ('none' | 'point' | 'line' | 'bezeir' | 'anime') -> IO ()
 	setMode: (mode) ->
 		switch @mode
 			when 'none'
@@ -269,6 +312,8 @@ MDS =
 			when 'anime'
 				$ '#animations'
 					.show 1000
+
+	## setFrame :: Int -> IO ()
 	setFrame: (frame) ->
 		@editFrame = frame
 		$ '#animation-range'
@@ -287,6 +332,8 @@ MDS =
 					y: y1
 					width: x2 - x1
 					height: y2 - y1
+
+	## moveStartFrame :: Int -> IO ()
 	moveStartFrame: (d) ->
 		unless 0 <= @frameShowStart + d <= view_sec * FPS - @animationFrameLength
 			return false
@@ -294,8 +341,12 @@ MDS =
 		@reload s for s in @shapeList
 		true
 class Shape
+
 	visible: false
+
 	selected: false
+
+	## constructor :: Maybe (Shape -> Int) -> IO ()
 	constructor: (parent, index) ->
 		@children = []
 		@cs = {
@@ -304,8 +355,12 @@ class Shape
 		@parent = parent ? null
 		@html_id = if parent? then "#{parent.html_id}-#{index}" else MDS.html_id++
 		@parent?.children.push this
+
+	## setColor :: Int -> Int -> Int -> Maybe Int -> IO ()
 	setColor: (r, g, b, f = MDS.editFrame) ->
 		@cs[f] = [r, g, b]
+
+	## getColor :: Maybe Int -> {r: Int, g: Int, b: Int}
 	getColor: (f = MDS.editFrame) ->
 		oldF = -1
 		[oldR, oldG, oldB] = @cs[0]
@@ -325,26 +380,46 @@ class Shape
 			g: Math.floor oldG
 			b: Math.floor oldB
 		}
+
+	## toSvg :: Maybe Int -> $
 	toSvg: (f = MDS.editFrame) ->
 		pass
+
+	## updateSvg :: $ -> Maybe Int -> IO ()
 	updateSvg: (svg, f = MDS.editFrame) ->
 		pass
+
+	## toTr :: Maybe Int -> $
 	toTr: (f = MDS.editFrame) ->
 		pass
+
+	## updateTr :: $ -> Maybe Int -> IO ()
 	updateTr: (tr, f = MDS.editFrame) ->
 		pass
+
+	## coverRect :: Maybe Int -> [[Int, Int], [Int, Int]]
 	coverRect: (f = MDS.editFrame) ->
 		pass
+
 class Pointlike extends Shape
+
+	## constructor :: Maybe (Shape -> Int) -> IO ()
 	constructor: (parent, index) ->
 		super parent, index 
 class Point extends Pointlike
+
 	MDS.shapeTypes['point'] = @
+
+	## constructor :: Maybe (Shape -> Int) -> IO ()
 	constructor: (parent, index) ->
 		@ps = {}
 		super parent, index
+
+	## set :: Int -> Int -> Maybe Int -> IO ()
 	set: (x, y, f = MDS.editFrame) ->
 		@ps[f] = [x, y]
+
+	## get :: Maybe Int -> [Int, Int]
 	get: (f = MDS.editFrame) ->
 		oldF = -1
 		[oldX, oldY] = @ps[0]
@@ -361,12 +436,14 @@ class Point extends Pointlike
 			Math.floor oldX
 			Math.floor oldY
 		]
+
 	toSvg: (f = MDS.editFrame) ->
 		[x, y] = @get f
 		if @parent?
 			"<circle cx='#{x}' cy='#{y}' r='5' fill='transparent' stroke='#00f'/>"
 		else
 			"<circle cx='#{x}' cy='#{y}' r='2' fill='##{RGBToHex @getColor f}'/>"
+
 	updateSvg: (svg, f = MDS.editFrame) ->
 		[x, y] = @get f
 		svg.attr
@@ -375,16 +452,19 @@ class Point extends Pointlike
 		unless @parent?
 			svg.attr
 				fill: '#' + RGBToHex @getColor f
+
 	toTr: (f = MDS.editFrame) ->
 		[x, y] = @get f
 		"<tr><td class='html-id' title='点(#{x}, #{y})'>#{@html_id}</td>
 			 <td class='shape-type' title='(#{x}, #{y})'>Point</td></tr>"
+
 	updateTr: (tr, f = MDS.editFrame) ->
 		[x, y] = @get f
 		tr.children '.html-id'
 			.attr title: "点(#{x}, #{y})"
 		tr.children '.shape-type'
 			.attr title: "(#{x}, #{y})"
+
 	coverRect: (f = MDS.editFrame) ->
 		[x, y] = @get f
 		if @parent?
@@ -397,16 +477,22 @@ class Point extends Pointlike
 				[x - 3, y - 3]
 				[x + 3, y + 3]
 			]
+
 class Line extends Shape
+
 	MDS.shapeTypes['line'] = @
+
+	## constructor :: Maybe (Shape -> Int) -> IO ()
 	constructor: (parent, index) ->
 		super parent, index
 		@s = new Point this, 0
 		@e = new Point this, 1
+
 	toSvg: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
 		"<line x1='#{sx}' y1='#{sy}' x2='#{ex}' y2='#{ey}' fill='none' stroke='##{RGBToHex @getColor f}'/>"
+
 	updateSvg: (svg, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
@@ -416,11 +502,13 @@ class Line extends Shape
 			x2: ex
 			y2: ey
 			stroke: '#' + RGBToHex @getColor f
+
 	toTr: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
 		"<tr><td class='html-id' title='直線((#{sx}, #{sy}) (#{ex}, #{ey}))'>#{@html_id}</td>
 			 <td class='shape-type' title='(#{sx}, #{sy}) (#{ex}, #{ey})'>Line</td></tr>"
+
 	updateTr: (tr, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
@@ -428,6 +516,7 @@ class Line extends Shape
 			.attr title: "直線((#{sx}, #{sy}) (#{ex}, #{ey}))"
 		tr.children '.shape-type'
 			.attr title: "((#{sx}, #{sy}) (#{ex}, #{ey}))"
+
 	coverRect: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
@@ -435,20 +524,26 @@ class Line extends Shape
 			[Math.min(sx, ex), Math.min(sy, ey)]
 			[Math.max(sx, ex), Math.max(sy, ey)]
 		]
+
 class Bezeir extends Shape
+
 	MDS.shapeTypes['bezeir'] = @
+
+	## constructor :: Maybe (Shape -> Int) -> IO ()
 	constructor: (parent, index)->
 		super parent, index
 		@s = new Point this, 0
 		@c1 = new Point this, 1
 		@c2 = new Point this, 2
 		@e = new Point this, 3
+
 	toSvg: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[c1x, c1y] = @c1.get f
 		[c2x, c2y] = @c2.get f
 		[ex, ey] = @e.get f
 		"<path d='M #{sx} #{sy} C #{c1x} #{c1y} #{c2x} #{c2y} #{ex} #{ey}' fill='none' stroke='##{RGBToHex @getColor f}'/>"
+
 	updateSvg: (svg, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[c1x, c1y] = @c1.get f
@@ -457,6 +552,7 @@ class Bezeir extends Shape
 		svg.attr
 			d: "M #{sx} #{sy} C #{c1x} #{c1y} #{c2x} #{c2y} #{ex} #{ey}"
 			stroke: '#' + RGBToHex @getColor f
+
 	toTr: (f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[c1x, c1y] = @c1.get f
@@ -464,6 +560,7 @@ class Bezeir extends Shape
 		[ex, ey] = @e.get f
 		"<tr><td class='html-id' title='3次ベジェ曲線((#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey}))'>#{@html_id}</td>
 			 <td class='shape-type' title='(#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey})'>Bezeir</td></tr>"
+
 	updateTr: (tr, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[c1x, c1y] = @c1.get f
@@ -473,6 +570,7 @@ class Bezeir extends Shape
 			.attr title: "3次ベジェ曲線((#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey}))"
 		tr.children '.shape-type'
 			.attr title: "(#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey})"
+
 	coverRect: (f = MDS.editFrame) ->
 		minmax = (p0, p1, p2, p3) ->
 			[a, b, c, d] = [-(p0 - 3 * p1 + 3 * p2 - p3), 3 * p0 - 6 * p1 + 3 * p2, -(3 * p0 - 3 * p1), p0]
@@ -508,9 +606,13 @@ class Bezeir extends Shape
 			[xmax, ymax]
 		]
 $ ->
+
 	frame = 0
+
 	interval = null
+
 	isLooping = false
+
 	$ '#mode-none'
 		.click ->
 			MDS.setMode 'none'
@@ -518,6 +620,7 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#draw-point'
 		.click ->
 			MDS.setMode 'point'
@@ -525,6 +628,7 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#draw-line'
 		.click ->
 			MDS.setMode 'line'
@@ -532,6 +636,7 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#draw-bezeir'
 		.click ->
 			MDS.setMode 'bezeir'
@@ -539,12 +644,14 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#change-color'
 		.ColorPicker
 			color: '#f00'
 			onSubmit: (hsb, hex, rgb) ->
 				MDS.selectedTop.setColor rgb.r, rgb.g, rgb.b
 				MDS.reload MDS.selectedTop
+
 	$ '#move-point'
 		.click ->
 			MDS.setMode 'move'
@@ -552,6 +659,7 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#animation-mode'
 		.click ->
 			MDS.setMode 'anime'
@@ -559,10 +667,12 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#animation-range'
 		.attr max: view_sec * FPS
 		.change ->
 			MDS.setFrame frame = $(@).val()
+
 	$ '#animation-start'
 		.click ->
 			$ '#animation-start'
@@ -593,6 +703,7 @@ $ ->
 					else
 						MDS.setFrame frame
 				, 1000 / FPS
+
 	$ '#animation-pause'
 		.click ->
 			$ '#animation-start'
@@ -604,6 +715,7 @@ $ ->
 			$ '#animation-stop'
 				.removeClass 'tool-selected'
 			clearInterval interval
+
 	$ '#animation-stop'
 		.click ->
 			$ '#animation-start'
@@ -617,6 +729,7 @@ $ ->
 			clearInterval interval
 			frame = 0
 			MDS.setFrame 0
+
 	$ '#animation-loop'
 		.click ->
 			isLooping = !isLooping
@@ -626,29 +739,36 @@ $ ->
 			else
 				$ @
 					.removeClass 'tool-selected'
+
 	$ '#show-mds-info'
 		.click ->
 			$ '#mds-info'
 				.css 'display', if $('#mds-info').css('display') == 'none' then 'block' else 'none'
 			$ @
 				.toggleClass 'tool-selected'
+
 	$ '#unselect'
 		.click ->
 			MDS.unselectAll()
+
 	$ '#remove'
 		.click ->
 			MDS.remove MDS.selectedMainly
+
 	$ '#prev-frame'
 		.click ->
 			unless MDS.moveStartFrame -1
 				alert '最初です'
+
 	$ '#next-frame'
 		.click ->
 			unless MDS.moveStartFrame +1
 				alert '最後です'
+
 	$ '#canvas'
 		.click (ev) ->
 			MDS.onClick ev
+
 	for i in [0 ... MDS.animationFrameLength]
 		$ "<th data-frame=#{i} class='#{
 			if i == MDS.editFrame

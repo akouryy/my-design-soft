@@ -1,7 +1,11 @@
 $ ->
+
 	frame = 0
+
 	interval = null
+
 	isLooping = false
+
 	$ '#mode-none'
 		.click ->
 			MDS.setMode 'none'
@@ -9,6 +13,7 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#draw-point'
 		.click ->
 			MDS.setMode 'point'
@@ -16,6 +21,7 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#draw-line'
 		.click ->
 			MDS.setMode 'line'
@@ -23,6 +29,7 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#draw-bezeir'
 		.click ->
 			MDS.setMode 'bezeir'
@@ -30,12 +37,14 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#change-color'
 		.ColorPicker
 			color: '#f00'
 			onSubmit: (hsb, hex, rgb) ->
 				MDS.selectedTop.setColor rgb.r, rgb.g, rgb.b
 				MDS.reload MDS.selectedTop
+
 	$ '#move-point'
 		.click ->
 			MDS.setMode 'move'
@@ -43,6 +52,7 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#animation-mode'
 		.click ->
 			MDS.setMode 'anime'
@@ -50,10 +60,12 @@ $ ->
 				.removeClass 'tool-selected'
 			$ @
 				.addClass 'tool-selected'
+
 	$ '#animation-range'
 		.attr max: view_sec * FPS
 		.change ->
 			MDS.setFrame frame = $(@).val()
+
 	$ '#animation-start'
 		.click ->
 			$ '#animation-start'
@@ -84,6 +96,7 @@ $ ->
 					else
 						MDS.setFrame frame
 				, 1000 / FPS
+
 	$ '#animation-pause'
 		.click ->
 			$ '#animation-start'
@@ -95,6 +108,7 @@ $ ->
 			$ '#animation-stop'
 				.removeClass 'tool-selected'
 			clearInterval interval
+
 	$ '#animation-stop'
 		.click ->
 			$ '#animation-start'
@@ -108,6 +122,7 @@ $ ->
 			clearInterval interval
 			frame = 0
 			MDS.setFrame 0
+
 	$ '#animation-loop'
 		.click ->
 			isLooping = !isLooping
@@ -117,29 +132,36 @@ $ ->
 			else
 				$ @
 					.removeClass 'tool-selected'
+
 	$ '#show-mds-info'
 		.click ->
 			$ '#mds-info'
 				.css 'display', if $('#mds-info').css('display') == 'none' then 'block' else 'none'
 			$ @
 				.toggleClass 'tool-selected'
+
 	$ '#unselect'
 		.click ->
 			MDS.unselectAll()
+
 	$ '#remove'
 		.click ->
 			MDS.remove MDS.selectedMainly
+
 	$ '#prev-frame'
 		.click ->
 			unless MDS.moveStartFrame -1
 				alert '最初です'
+
 	$ '#next-frame'
 		.click ->
 			unless MDS.moveStartFrame +1
 				alert '最後です'
+
 	$ '#canvas'
 		.click (ev) ->
 			MDS.onClick ev
+
 	for i in [0 ... MDS.animationFrameLength]
 		$ "<th data-frame=#{i} class='#{
 			if i == MDS.editFrame
