@@ -7,7 +7,7 @@ Latest version: 0.0.α (Last update: 2014-05-29 JST)
 \*In alpha version we update it many times, so there's no detailed version of it.  
 
 ## Demo
-<http://akouryy.net/program/js/mds/> (It provides only Japanese version yet)  
+<http://akouryy.github.io/my-design-soft/> (It provides only Japanese version yet)  
 *Use this software at your own risk,* particularly as it is alpha version  
 
 ## Function

@@ -7,7 +7,7 @@
 ※αは細かい変更を幾度となく加えるので詳細バージョンは存在しません。  
 
 ## デモ
-<http://akouryy.net/program/js/mds/>  
+<http://akouryy.github.io/my-design-soft/>  
 *自己責任で使ってください。* 特に現在αバージョンなので注意。  
 
 ## 機能
