@@ -25,19 +25,15 @@ class Shape
 		for newF, [newR, newG, newB] of @cs
 			if newF >= f
 				return {
-					r: Math.floor oldR + (newR - oldR) / (newF - oldF) * (f - oldF)
-					g: Math.floor oldG + (newG - oldG) / (newF - oldF) * (f - oldF)
-					b: Math.floor oldB + (newB - oldB) / (newF - oldF) * (f - oldF)
+					r: oldR + (newR - oldR) // (newF - oldF) * (f - oldF)
+					g: oldG + (newG - oldG) // (newF - oldF) * (f - oldF)
+					b: oldB + (newB - oldB) // (newF - oldF) * (f - oldF)
 				}
 			oldF = newF
 			oldR = newR
 			oldG = newG
 			oldB = newB
-		return {
-			r: Math.floor oldR
-			g: Math.floor oldG
-			b: Math.floor oldB
-		}
+		return {r: oldR, g: oldG, b: oldB}
 
 	## toSvg :: Maybe Int -> $
 	toSvg: (f = MDS.editFrame) ->
@@ -84,16 +80,13 @@ class Point extends Pointlike
 		for newF, [newX, newY] of @ps
 			if newF >= f
 				return [
-					Math.floor oldX + (newX - oldX) / (newF - oldF) * (f - oldF)
-					Math.floor oldY + (newY - oldY) / (newF - oldF) * (f - oldF)
+					oldX + (newX - oldX) // (newF - oldF) * (f - oldF)
+					oldY + (newY - oldY) // (newF - oldF) * (f - oldF)
 				]
 			oldF = newF
 			oldX = newX
 			oldY = newY
-		return [
-			Math.floor oldX
-			Math.floor oldY
-		]
+		return [oldX, oldY]
 
 	toSvg: (f = MDS.editFrame) ->
 		[x, y] = @get f
