@@ -60,7 +60,8 @@ MDS =
 
 	## prepareTr :: Shape -> Boolean -> $
 	prepareTr: (shape, isAnime) ->
-		tr = $ shape.toTr()
+		tr = $ "<tr><td class='html-id' title='#{shape.shapeName}#{shape.posStr()}'>#{shape.html_id}</td>
+			 	<td class='shape-type' title='#{shape.posStr()}'>#{shape.shapeName}</td></tr>"
 		if isAnime
 			tr.attr 'id', "anime-#{shape.html_id}"
 			for i in [@frameShowStart ... @frameShowStart + @animationFrameLength]

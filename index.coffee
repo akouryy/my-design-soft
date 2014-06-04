@@ -1,5 +1,8 @@
 pass = undefined
 
+## always :: a -> (() -> a)
+always = (x) -> -> x
+
 ## debug :: (String | Exception) -> IO ()
 debug = (x) ->
 	alert x
@@ -16,6 +19,9 @@ RGBToHex = (rgb) ->
 		if val.length == 1
 			hex[i] = "0#{val}"
 	hex.join ''
+
+Function::property = (prop, desc) ->
+	Object.defineProperty @prototype, prop, desc
 FPS = 10
 
 view_sec = 10
@@ -78,7 +84,8 @@ MDS =
 
 	## prepareTr :: Shape -> Boolean -> $
 	prepareTr: (shape, isAnime) ->
-		tr = $ shape.toTr()
+		tr = $ "<tr><td class='html-id' title='#{shape.shapeName}#{shape.posStr()}'>#{shape.html_id}</td>
+			 	<td class='shape-type' title='#{shape.posStr()}'>#{shape.shapeName}</td></tr>"
 		if isAnime
 			tr.attr 'id', "anime-#{shape.html_id}"
 			for i in [@frameShowStart ... @frameShowStart + @animationFrameLength]
@@ -367,19 +374,15 @@ class Shape
 		for newF, [newR, newG, newB] of @cs
 			if newF >= f
 				return {
-					r: Math.floor oldR + (newR - oldR) / (newF - oldF) * (f - oldF)
-					g: Math.floor oldG + (newG - oldG) / (newF - oldF) * (f - oldF)
-					b: Math.floor oldB + (newB - oldB) / (newF - oldF) * (f - oldF)
+					r: oldR + (newR - oldR) // (newF - oldF) * (f - oldF)
+					g: oldG + (newG - oldG) // (newF - oldF) * (f - oldF)
+					b: oldB + (newB - oldB) // (newF - oldF) * (f - oldF)
 				}
 			oldF = newF
 			oldR = newR
 			oldG = newG
 			oldB = newB
-		return {
-			r: Math.floor oldR
-			g: Math.floor oldG
-			b: Math.floor oldB
-		}
+		return {r: oldR, g: oldG, b: oldB}
 
 	## toSvg :: Maybe Int -> $
 	toSvg: (f = MDS.editFrame) ->
@@ -406,9 +409,16 @@ class Pointlike extends Shape
 	## constructor :: Maybe (Shape -> Int) -> IO ()
 	constructor: (parent, index) ->
 		super parent, index 
+
 class Point extends Pointlike
 
 	MDS.shapeTypes['point'] = @
+
+	shapeName: '点'
+
+	posStr: (f = MDS.editFrame) ->
+		[x, y] = @get f
+		"(#{x}, #{y})"
 
 	## constructor :: Maybe (Shape -> Int) -> IO ()
 	constructor: (parent, index) ->
@@ -426,16 +436,13 @@ class Point extends Pointlike
 		for newF, [newX, newY] of @ps
 			if newF >= f
 				return [
-					Math.floor oldX + (newX - oldX) / (newF - oldF) * (f - oldF)
-					Math.floor oldY + (newY - oldY) / (newF - oldF) * (f - oldF)
+					oldX + (newX - oldX) // (newF - oldF) * (f - oldF)
+					oldY + (newY - oldY) // (newF - oldF) * (f - oldF)
 				]
 			oldF = newF
 			oldX = newX
 			oldY = newY
-		return [
-			Math.floor oldX
-			Math.floor oldY
-		]
+		return [oldX, oldY]
 
 	toSvg: (f = MDS.editFrame) ->
 		[x, y] = @get f
@@ -452,11 +459,6 @@ class Point extends Pointlike
 		unless @parent?
 			svg.attr
 				fill: '#' + RGBToHex @getColor f
-
-	toTr: (f = MDS.editFrame) ->
-		[x, y] = @get f
-		"<tr><td class='html-id' title='点(#{x}, #{y})'>#{@html_id}</td>
-			 <td class='shape-type' title='(#{x}, #{y})'>Point</td></tr>"
 
 	updateTr: (tr, f = MDS.editFrame) ->
 		[x, y] = @get f
@@ -482,6 +484,13 @@ class Line extends Shape
 
 	MDS.shapeTypes['line'] = @
 
+	shapeName: '直線'
+
+	posStr: (f = MDS.editFrame) ->
+		[x1, y1] = @s.get f
+		[x2, y2] = @e.get f
+		"(#{x1}, #{y1}) (#{x2}, #{y2})"
+
 	## constructor :: Maybe (Shape -> Int) -> IO ()
 	constructor: (parent, index) ->
 		super parent, index
@@ -503,12 +512,6 @@ class Line extends Shape
 			y2: ey
 			stroke: '#' + RGBToHex @getColor f
 
-	toTr: (f = MDS.editFrame) ->
-		[sx, sy] = @s.get f
-		[ex, ey] = @e.get f
-		"<tr><td class='html-id' title='直線((#{sx}, #{sy}) (#{ex}, #{ey}))'>#{@html_id}</td>
-			 <td class='shape-type' title='(#{sx}, #{sy}) (#{ex}, #{ey})'>Line</td></tr>"
-
 	updateTr: (tr, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f
 		[ex, ey] = @e.get f
@@ -528,6 +531,15 @@ class Line extends Shape
 class Bezeir extends Shape
 
 	MDS.shapeTypes['bezeir'] = @
+
+	shapeName: 'ベジェ曲線'
+
+	posStr: (f = MDS.editFrame) ->
+		[x1, y1] = @s.get f
+		[x2, y2] = @c1.get f
+		[x3, y3] = @c2.get f
+		[x4, y4] = @e.get f
+		"(#{x1}, #{y1}) (#{x2}, #{y2}) (#{x3}, #{y3}) (#{x4}, #{y4})"
 
 	## constructor :: Maybe (Shape -> Int) -> IO ()
 	constructor: (parent, index)->
@@ -552,14 +564,6 @@ class Bezeir extends Shape
 		svg.attr
 			d: "M #{sx} #{sy} C #{c1x} #{c1y} #{c2x} #{c2y} #{ex} #{ey}"
 			stroke: '#' + RGBToHex @getColor f
-
-	toTr: (f = MDS.editFrame) ->
-		[sx, sy] = @s.get f
-		[c1x, c1y] = @c1.get f
-		[c2x, c2y] = @c2.get f
-		[ex, ey] = @e.get f
-		"<tr><td class='html-id' title='3次ベジェ曲線((#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey}))'>#{@html_id}</td>
-			 <td class='shape-type' title='(#{sx}, #{sy}) (#{c1x}, #{c1y}) (#{c2x}, #{c2y}) (#{ex}, #{ey})'>Bezeir</td></tr>"
 
 	updateTr: (tr, f = MDS.editFrame) ->
 		[sx, sy] = @s.get f

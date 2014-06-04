@@ -1,5 +1,8 @@
 pass = undefined
 
+## always :: a -> (() -> a)
+always = (x) -> -> x
+
 ## debug :: (String | Exception) -> IO ()
 debug = (x) ->
 	alert x
@@ -16,3 +19,6 @@ RGBToHex = (rgb) ->
 		if val.length == 1
 			hex[i] = "0#{val}"
 	hex.join ''
+
+Function::property = (prop, desc) ->
+	Object.defineProperty @prototype, prop, desc
